@@ -1,0 +1,1 @@
+A Ubicity Plugin to gather public information from Facebook pages.
