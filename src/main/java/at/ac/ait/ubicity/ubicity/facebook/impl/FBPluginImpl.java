@@ -19,11 +19,12 @@ package at.ac.ait.ubicity.ubicity.facebook.impl;
 
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import net.xeoh.plugins.base.annotations.events.Init;
+import net.xeoh.plugins.base.annotations.events.Shutdown;
 
 import org.apache.log4j.Logger;
 
 import at.ac.ait.ubicity.commons.broker.BrokerProducer;
-import at.ac.ait.ubicity.commons.broker.exceptions.UbicityBrokerException;
+import at.ac.ait.ubicity.commons.exceptions.UbicityBrokerException;
 import at.ac.ait.ubicity.commons.util.PropertyLoader;
 import at.ac.ait.ubicity.ubicity.facebook.FBPlugin;
 
@@ -33,16 +34,14 @@ public class FBPluginImpl extends BrokerProducer implements FBPlugin {
 	private String name;
 
 	private String esIndex;
-
-	volatile boolean shutdown = false;
+	private String pluginDest;
 
 	final static Logger logger = Logger.getLogger(FBPluginImpl.class);
 
 	@Override
 	@Init
 	public void init() {
-		PropertyLoader config = new PropertyLoader(
-				FBPluginImpl.class.getResource("/facebook.cfg"));
+		PropertyLoader config = new PropertyLoader(FBPluginImpl.class.getResource("/facebook.cfg"));
 		setProducerSettings(config);
 		setPluginConfig(config);
 
@@ -56,9 +55,8 @@ public class FBPluginImpl extends BrokerProducer implements FBPlugin {
 	 */
 	private void setProducerSettings(PropertyLoader config) {
 		try {
-			super.init(config.getString("plugin.fb.broker.user"),
-					config.getString("plugin.fb.broker.pwd"));
-			setProducer(config.getString("plugin.fb.broker.dest"));
+			super.init(config.getString("plugin.fb.broker.user"), config.getString("plugin.fb.broker.pwd"));
+			pluginDest = config.getString("plugin.fb.broker.dest");
 
 		} catch (UbicityBrokerException e) {
 			logger.error("During init caught exc.", e);
@@ -78,5 +76,11 @@ public class FBPluginImpl extends BrokerProducer implements FBPlugin {
 	@Override
 	public String getName() {
 		return this.name;
+	}
+
+	@Override
+	@Shutdown
+	public void shutdown() {
+		shutdown(pluginDest);
 	}
 }
