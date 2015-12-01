@@ -25,6 +25,7 @@ import org.apache.log4j.Logger;
 
 import at.ac.ait.ubicity.commons.broker.BrokerProducer;
 import at.ac.ait.ubicity.commons.exceptions.UbicityBrokerException;
+import at.ac.ait.ubicity.commons.util.ESIndexCreator;
 import at.ac.ait.ubicity.commons.util.PropertyLoader;
 import at.ac.ait.ubicity.ubicity.facebook.FBPlugin;
 
@@ -33,7 +34,7 @@ public class FBPluginImpl extends BrokerProducer implements FBPlugin {
 
 	private String name;
 
-	private String esIndex;
+	private ESIndexCreator ic;
 	private String pluginDest;
 
 	final static Logger logger = Logger.getLogger(FBPluginImpl.class);
@@ -55,7 +56,7 @@ public class FBPluginImpl extends BrokerProducer implements FBPlugin {
 	 */
 	private void setProducerSettings(PropertyLoader config) {
 		try {
-			super.init(config.getString("plugin.fb.broker.user"), config.getString("plugin.fb.broker.pwd"));
+			super.init();
 			pluginDest = config.getString("plugin.fb.broker.dest");
 
 		} catch (UbicityBrokerException e) {
@@ -70,7 +71,7 @@ public class FBPluginImpl extends BrokerProducer implements FBPlugin {
 	 */
 	private void setPluginConfig(PropertyLoader config) {
 		this.name = config.getString("plugin.fb.name");
-		esIndex = config.getString("plugin.fb.elasticsearch.index");
+		ic = new ESIndexCreator(config.getString("plugin.fb.elasticsearch.index"), "", config.getString("plugin.fb.elasticsearch.pattern"));
 	}
 
 	@Override
